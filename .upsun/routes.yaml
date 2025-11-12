@@ -1,19 +1,10 @@
 # Each route describes how an incoming URL will be processed by Platform.sh.
 
 routes:
-    "https://{default}/":
-        type: upstream
-        upstream: "ll_project:http"
-        
-    "https://www.{default}/":
-        type: redirect
-        to: "https://{default}/"
-        
-    # 建议添加 HTTP 重定向
-    "http://{default}/":
-        type: redirect
-        to: "https://{default}/"
-        
-    "http://www.{default}/":
-        type: redirect
-        to: "https://{default}/"
+  "https://{default}/":
+    type: upstream
+    upstream: "ll_project:http"
+
+  "https://www.{default}/":
+    type: redirect
+    to: "https://{default}/"
