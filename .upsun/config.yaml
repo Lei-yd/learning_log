@@ -50,4 +50,3 @@ services:
   # 服务名称（唯一，这里用db）
   db:
     type: postgresql:18  # 数据库类型和版本
-    disk: 1024  # 数据库磁盘大小（MB，服务的disk配置在这里）
