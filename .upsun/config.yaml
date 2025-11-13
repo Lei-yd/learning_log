@@ -34,4 +34,18 @@ applications:
       python manage.py collectstatic
       rm -rf logs
     deploy: |
-      python manage.py migrate        
+      python manage.py migrate  
+
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "ll_project:http"
+
+  "https://www.{default}/":
+    type: redirect
+    to: "https://{default}/"
+
+services:
+  # The name of the service container. Must be unique within a project.
+  postgresql:
+    type: postgresql:18      
