@@ -34,7 +34,7 @@ applications:
         python manage.py migrate
     # 关联服务（关联下面定义的postgresql服务）
     relationships:
-      postgresql: "db:postgresql"  # "db"是下面services中定义的服务名
+      database: "db:postgresql"   # "db"是下面services中定义的服务名
 
 # 顶级配置：路由规则（与applications同级，而非应用内部）
 routes:
