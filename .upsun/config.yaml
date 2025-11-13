@@ -1,7 +1,10 @@
+# 顶级配置：应用定义
 applications:
-  # The app's name, which must be unique within the project.
+  # 应用名称（唯一）
   ll_project:
-    type: 'python:3.13'  # 修复缩进：属于ll_project的子项
+    # 应用类型（必须缩进，作为ll_project的子项）
+    type: 'python:3.13'
+    # Web服务配置
     web:
       upstream:
         socket_family: unix
@@ -14,35 +17,37 @@ applications:
           root: "static"
           expires: 1h
           allow: true
-
-    # The size of the persistent disk of the application (in MB).
-    disk: 512  # 修复缩进：属于ll_project的子项
-
-    # Set a local read/write mount for logs.
-    mounts:  # 修复缩进：属于ll_project的子项
+    # 挂载配置（日志目录）
+    mounts:
       "logs":
         source: local
         source_path: logs
-
-    hooks:  # 修复缩进：属于ll_project的子项
+    # 构建和部署钩子
+    hooks:
       build: |
         pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements_remote.txt
-        mkdir -p logs  # 确保目录存在（替换rm -rf logs，避免删除目录）
-        python manage.py collectstatic --noinput  # 非交互式避免部署中断
+        mkdir -p logs  # 确保目录存在（删除rm -rf logs，避免误删）
+        python manage.py collectstatic --noinput  # 非交互式执行
       deploy: |
-        python manage.py migrate  
+        python manage.py migrate
+    # 关联服务（关联下面定义的postgresql服务）
+    relationships:
+      postgresql: "db:postgresql"  # "db"是下面services中定义的服务名
 
-    routes:  # 修复缩进：属于ll_project的子项（解决"routes: No configuration found"）
-      "https://{default}/":
-        type: upstream
-        upstream: "ll_project:http"
-      "https://www.{default}/":
-        type: redirect
-        to: "https://{default}/"
+# 顶级配置：路由规则（与applications同级，而非应用内部）
+routes:
+  "https://{default}/":
+    type: upstream
+    upstream: "ll_project:http"  # 关联上面定义的应用ll_project
+  "https://www.{default}/":
+    type: redirect
+    to: "https://{default}/"
 
-    services:  # 修复缩进：属于ll_project的子项
-      # The name of the service container. Must be unique within a project.
-      postgresql:
-        type: postgresql:18      
+# 顶级配置：服务定义（与applications同级，而非应用内部）
+services:
+  # 服务名称（唯一，这里用db）
+  db:
+    type: postgresql:18  # 数据库类型和版本
+    disk: 1024  # 数据库磁盘大小（MB，服务的disk配置在这里）
