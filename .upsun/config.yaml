@@ -1,51 +1,48 @@
 applications:
   # The app's name, which must be unique within the project.
   ll_project:
-  type: 'python:3.13'
-  web:
-    upstream:
-      socket_family: unix
-    commands:
-      start: "gunicorn -w 4 -b unix:$SOCKET ll_project.wsgi:application"
-    locations:
-      "/":
-        passthru: true
-      "/static":
-        root: "static"
-        expires: 1h
-        allow: true
+    type: 'python:3.13'  # 修复缩进：属于ll_project的子项
+    web:
+      upstream:
+        socket_family: unix
+      commands:
+        start: "gunicorn -w 4 -b unix:$SOCKET ll_project.wsgi:application"
+      locations:
+        "/":
+          passthru: true
+        "/static":
+          root: "static"
+          expires: 1h
+          allow: true
 
-  # The size of the persistent disk of the application (in MB).
-  disk: 512
+    # The size of the persistent disk of the application (in MB).
+    disk: 512  # 修复缩进：属于ll_project的子项
 
-  # Set a local read/write mount for logs.
-  mounts:
-    "logs":
-      source: local
-      source_path: logs
+    # Set a local read/write mount for logs.
+    mounts:  # 修复缩进：属于ll_project的子项
+      "logs":
+        source: local
+        source_path: logs
 
-  hooks:
-    build: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      pip install -r requirements_remote.txt
-          
-      mkdir logs
-      python manage.py collectstatic
-      rm -rf logs
-    deploy: |
-      python manage.py migrate  
+    hooks:  # 修复缩进：属于ll_project的子项
+      build: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements_remote.txt
+        mkdir -p logs  # 确保目录存在（替换rm -rf logs，避免删除目录）
+        python manage.py collectstatic --noinput  # 非交互式避免部署中断
+      deploy: |
+        python manage.py migrate  
 
-  routes:
-    "https://{default}/":
-      type: upstream
-      upstream: "ll_project:http"
+    routes:  # 修复缩进：属于ll_project的子项（解决"routes: No configuration found"）
+      "https://{default}/":
+        type: upstream
+        upstream: "ll_project:http"
+      "https://www.{default}/":
+        type: redirect
+        to: "https://{default}/"
 
-    "https://www.{default}/":
-      type: redirect
-      to: "https://{default}/"
-
-  services:
-    # The name of the service container. Must be unique within a project.
-    postgresql:
-      type: postgresql:18      
+    services:  # 修复缩进：属于ll_project的子项
+      # The name of the service container. Must be unique within a project.
+      postgresql:
+        type: postgresql:18      
